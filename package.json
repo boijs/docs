@@ -1,0 +1,13 @@
+{
+  "name": "boi-doc",
+  "version": "0.0.1",
+  "description": "boi documents",
+  "main": "index.js",
+  "scripts": {
+    "dev": "docsify serve ./",
+    "build": "",
+    "release": ""
+  },
+  "author": "zhoujunpeng <zjp0432@163.com> (http://caiziguoguo.com)",
+  "license": "MIT"
+}
