@@ -44,7 +44,7 @@ boi支持多页面开发，并且对于单页面应用和多页面应用分别�
 
 > 以上的`<name>`不要求同名，但是为了增强可读性，建议每个页面使用一致的命名。
 
-[html-webpack-plugin](https://doc.webpack-china.org/plugins/html-webpack-plugin/)的inject是一种反向注机制，这种机制的前提是在编译html文件之前必须知道它引用了哪些资源。单页面应用项目中的所有静态资源均属于当前页面，使用inject机制是没有问题的。但是对于多页面应用来说，各页面有不同的资源引用，甚至可能交叉引用。同时boi不强制要求每个页面资源命名的一致性，所以，我们将静态资源的引用交给了用户。
+[html-webpack-plugin](https://doc.webpack-china.org/plugins/html-webpack-plugin/)的inject是一种反向注入机制，这种机制的前提是在编译html文件之前必须知道它引用了哪些资源。单页面应用项目中的所有静态资源均属于当前页面，使用inject机制是没有问题的。但是对于多页面应用来说，各页面有不同的资源引用，甚至可能交叉引用。同时boi不强制要求每个页面资源命名的一致性，所以，我们将静态资源的引用交给了用户。
 
 比如一个多页面应用中存在以下文件：
 * 页面A和页面B的html入口文件`index.a.html`和`index.b.html`；
@@ -65,7 +65,7 @@ boi支持多页面开发，并且对于单页面应用和多页面应用分别�
 
 另外，如果交叉引用的资源存在先后顺序，比如`main.a.css`必须在`main.b.css`之前，inject机制无法处理这种需求。
 
-所以，boi最终采用了第二种方案解决交叉引用的问题。我们先看看这个例子最终的编译输出结果。`index.a.html`和`index.b.html`和源码内容分别如下：
+所以，boi最终采用了第二种方案解决这个问题。我们先看看这个例子最终的编译输出结果。`index.a.html`和`index.b.html`和源码内容分别如下：
 ```html
 <!DOCTYPE html>
 <!-- index.a.html -->
