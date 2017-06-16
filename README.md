@@ -1,4 +1,4 @@
-![](./assets/slogan.jpeg)
+![](./assets/slogan.png)
 
 boi是一套完整的前端工程化解决方案，涵盖项目的起始、开发、测试以及部署阶段。
 
