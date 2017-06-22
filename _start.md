@@ -42,10 +42,18 @@ boi new <dirname> -t <template>
 在项目根目录下执行：
 
 ```bash
-boi build --env <env>
+boi build --env <env> [--install]
 ```
 
-通过`<env>`指定构建项目的环境。`build`命令默认在`testing`环境下编译。
+* `<env>`指定构建项目的环境。`build`命令默认在`testing`环境下编译;
+* `--install`(可选)选项的作用是指明是否让boi自动检查依赖并自动安装。以下情况必须指定此选项：
+  * 项目初始化后第一次运行编译；
+  * 项目初始化后第一次运行本地服务器；
+  * 修改`boi-conf.js`后。
+
+  由于检查依赖需要花费大量时间，所以除以上三种情况以外，尽量避免使用此选项。
+
+  > `--install`选项针对的依赖是由boi配置文件转化为Webpack配置之后所需的依赖，而不是项目`package.json`中的`dependencies/devDependencies`指定的依赖。
 
 boi内置支持三种执行环境：
 * `dev`- 开发环境；
@@ -60,8 +68,10 @@ boi内置支持三种执行环境：
 boi提供一个本地服务容器，方便前端工程师独立开发。在项目根目录下运行`serve`命令：
 
 ```bash
-boi serve
+boi serve [--install]
 ```
+
+`--install`(可选)选项作用同编译功能。
 
 * 如果项目中只存在一个`index.*.html`文件，直接访问`localhost:8888`即可；
 

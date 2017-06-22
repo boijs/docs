@@ -20,6 +20,9 @@ boi.spec('basic',options);
 
 * `checkDependencies`：`Boolean`，编译之前是否自动检查并安装`package.json`中的`depdencies`和`devDependencies`模块，默认为`false`。此配置项的主要目的是为了将boi执行云编译时自动安装依赖模块。**如果你确定不会将boi作为云编译工具，请设置为`false`**，会大幅提升编译速度。
 
+* `limit`：`Object`，配置编译输出文件的体积上限，包括以下子选项：
+  * `maxEntrypointSize`：`Number`，入口文件体积上限，默认为150000，即150kb；
+  * `maxAssetSize`：`Number`，所有类型文件体积上限，默认为200000，即200kb。
 ### 示例
 
 ```JavaScript
@@ -29,6 +32,10 @@ boi.spec('basic', {
   output: './dest/',
   libs: './libs/',
   deployLibs: false,
-  checkDependencies: false
+  checkDependencies: false,
+  limit: {
+    maxEntrypointSize: 150000,
+    maxAssetSize: 200000
+  }
 });
 ```
