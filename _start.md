@@ -26,9 +26,9 @@ cnpm install boi -g
 
 ### 配置
 
-boi的配置文件入口为项目**根目录**下的`boi-conf.js`。
+Boi的配置文件入口为项目**根目录**下的`boi-conf.js`。
 
-boi的配置API包括以下内容：
+Boi的配置API包括以下内容：
 
 * 项目基本信息配置；
 * 针对具体模块的编译配置；
@@ -55,7 +55,7 @@ boi的配置API包括以下内容：
     * `options`为具体的配置项，json类型。配置项细节由具体插件定义。
 * `boi.envs([...])`：自定义环境变量，详见[多环境支持](_envs.md)。
 
-配置细节请查阅具体模块的配置文档。
+配置细节请查阅[配置文档](_config.md)。
 
 
 ### 脚手架
@@ -70,7 +70,7 @@ boi new <dirname> -t <template>
 
 > 更多的脚手架使用细节请参照[脚手架文档](_scaffold.md)。
 
-### 编译
+### 构建
 
 在项目根目录下执行：
 
@@ -96,6 +96,8 @@ boi build -e <env> [-i]
 > 关于boi环境配置的细节请参阅[多环境支持](_envs.md)。
 
 编译成功后，默认输出目录为`dest`。
+
+> 关于构建的详细功能配置请参阅[构建](_build.md)。
 
 ### 本地服务器
 boi提供一个本地服务容器，方便前端工程师独立开发。在项目根目录下运行`serve`命令：
@@ -146,8 +148,6 @@ boi.mock('Post /signup').proxy('https://passport.boi.com/signup');
 * 支持Get请求的`/userinfo`接口。必选参数`name`，支持jsonp并且jsonpCallback识别为`cb`(默认为`callback`)，返回数据自定义数据；
 * 代理接口`/signup`。将本地接口`/signup`的Post请求代理到'https://passport.boi.com/signup'接口。
 
-> 关于Mock的详细功能配置请参阅[Mock](_mock.md)。
-
 ##### 独立运行
 在项目根目录下运行：
 ```bash
@@ -168,6 +168,8 @@ boi server -s
 ```bash
 boi serve
 ```
+
+> 关于Mock的详细配置请参阅[Mock](_mock.md)。
 
 ### 部署
 

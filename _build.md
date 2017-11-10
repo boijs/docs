@@ -1,5 +1,8 @@
 ## 构建
 
+[![GitHub stars](https://img.shields.io/github/stars/boijs/boi-compiler.svg?style=social&label=Stars)](https://github.com/boijs/boi-compiler)
+[![GitHub forks](https://img.shields.io/github/forks/boijs/boi-compiler.svg?style=social&label=Fork)](https://github.com/boijs/boi-compiler)
+
 执行如下命令查看完整的build命令
 ```bash
 $ boi build -h

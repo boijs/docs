@@ -1,22 +1,37 @@
 ## JavaScript代码规范
 
-boi使用[eslint-loader](https://github.com/MoOx/eslint-loader)实现对JavaScript代码的规范检查，测试内核为[eslint](http://eslint.cn/)。
-
-boi默认使用[Airbnb JavaScript规范](https://github.com/airbnb/javascript)基本一致。
+boi使用[eslint-loader](https://github.com/MoOx/eslint-loader)实现对JavaScript代码的规范检查，执行`boi build -i`或`boi serve -i`后会在项目根目录下创建`.eslintrc`文件，内容如下：
+```json
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "script"
+  },
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "indent": [2, 2,{ "SwitchCase": 1 }],
+    "brace-style": [2, "1tbs"],
+    "quotes": [2, "single"],
+    "semi": [2, "always"],
+    "comma-style": [2, "last"],
+    "one-var": [2, "never"],
+    "no-console": 1,
+    "no-use-before-define": [2, "nofunc"],
+    "no-underscore-dangle": 0,
+    "no-constant-condition": 0,
+    "space-before-function-paren": [2, {"anonymous": "always", "named": "never"}],
+    "func-style": [2, "declaration"]
+  }
+}
+```
 
 ### 自定义规范
+你可以更加业务和团队需求自行修改`.eslintrc`的规范。
 
-你可以根据自身的业务需求自定义规范细节，步骤如下：
+**请注意**：每次执行`boi build -i`或`boi serve -i`均会重新创建`.eslintrc`文件，所以请确保做好备份。
 
-1. 在项目中创建json类型的规范配置文件，比如在根目录下创建`eslint_rules.json`；
-2. 配置boi：
-
-    ```
-    boi.spec('js',{
-      lint: true,
-      lintConfigFile: `./eslint_rules.json`
-    });
-    ```
-3. 根据[eslint配置](http://eslint.cn/docs/user-guide/configuring)和[eslint rules](http://eslint.cn/docs/rules/)修改`eslint_rules.json`内容。
-
-完成以上步骤后执行`boi build --env <env>`便会根据自定义的规范细节进行规范测试。
+> Boi提倡项目所采用的技术栈在初次初始化后便不再变化，每次初始化均会取代之前的设置。

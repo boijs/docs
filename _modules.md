@@ -1,70 +1,79 @@
 ## 模块化开发
 
-boi支持多种模块化方案，包括ES6 Modules、CommonJS和AMD。
+Boi的构建内核为Webpack，所以支持的模块化规范类型与Webpack相同，包括ES6 Modules、CommonJS和AMD。
 
-### ES6 Modules
-ES6 Modules是ECMAScript 6规范的一个新特性，目前浏览器兼容性非常不理想，所以需要在部署到生产环境之前必须经过转译。
+### 按需加载
+按需加载是前端优化很重要的一点，将当前页面暂不需要的js/css等资源单独打包成一个文件，当需要使用它们的时候（比如scroll到对应位置）再动态加载到客户端。Boi支持以下几种动态加载方案：
+* `require.ensure`；
+* `import()`函数；
+* AMD
 
-ES6 Modules与Java、PHP等语言的模块化方案类似，模块是静态的被同步引入。而前端资源难免会有一些load on command（按需加载）的部分，ES6 Modules原生并不能实现动态加载的需求。需要借助第三方工具实现，比如[systemjs](https://github.com/systemjs/systemjs)。
-
-> 动态加载最初也在ES6[草案](https://whatwg.github.io/loader/#system-loader-instance)中，目前仍在制定中，未来可期。
-
-### CommonJS
-
-boi的编译内核是webpack，webpack原生支持CommonJS和AMD，相对来说对CommonJS的支持度更好一些。主要表现在两方面：
-1. webpack runtime集成CommonJS runtime；
-2. 使用CommonJS实现按需加载时可以定义懒加载模块的name。
-
-比如有以下代码：
+#### require.ensure
+`require.ensure`是Webpack提供加载动态模块的API，可以搭配E6 Module和CommonJS规范使用（由于AMD规范通常已经占用了`require`命名空间，所以可能会与`require.ensure`产生冲突。并且AMD自身便具备动态加载功能，无需额外支持）。比如存在以下代码：
 ```JavaScript
-import '../styles/main.a.scss';
-import a from './part/part.a.js';
-import b from './part/part.b.js';
+import ModuleA from './part/module.a.js';
 
 window.onload = function() {
-    console.log('main chunk a is loaded');
-    a();
+    ModuleA();
     document.body.onclick = function() {
-        console.log('load on command');
         // 第三个参数是chunk name，决定编译打包的文件名称
         require.ensure([], (require) => {
-            let c = require('./part/part.c');
-            c.fn();
-        },'asyncC');
+            const ModuleB = require('./part/module.b');
+            ModuleB();
+        },'async');
     }
 };
-
 ```
 
-使用`require.ensure`实现动态加载，在onload之后点击body任意地方可以触发`part.c.js`的下载和执行。
+异步模块`module.b.js`将会被编译为：
+```bash
+app.async.36a23b99.js    1.49 kB       1  [emitted]
+```
 
-`require.ensure`第三个参数是动态加载模块的文件名。
+#### import()函数
+`import()`是被[ECMAScript提案](https://github.com/tc39/proposal-dynamic-import)专门用于实现动态加载的函数，目前已经处于Stage-3，基本可以确定会被加入未来的正式规范中。目前babel和webpack均已支持。
 
-### AMD
+`import()`的缺陷是无法定义异步文件的名称（上述示例中的`async`），针对这一缺陷Webpack提供了弥补方案：使用特殊注释进行定义。如下：
+```JavaScript
+import ModuleA from './part/module.a.js';
 
-AMD本身是对CommonJS的一种实现，它提供了浏览器的模块化runtime。以require.js为例，boi实现AMD的的步骤如下：
-1. 在html文档中引入`require.js`并制定`data-main`：
-    ```html
-    <script src="/libs/require.js" charset="utf-8" data-main="main.a.js"></script>
-    ```
-2. `main.a.js`代码如下：
-    ```JavaScript
-    import '../styles/main.a.scss';
+window.onload = function() {
+    ModuleA();
+    document.body.onclick = import(/* webpackChunkName: "aysnc" */'./part/module.b').then(moduleB => {
+        moduleB();
+    }).catch(err => {
+        throw new Error(err);
+    });
+};
+```
 
-    // ADM sample
-    require(['./part/part.a.js', './part/part.b.js'], function(a, b) {
-        console.log('main chunk a is loaded');
-        a();
-        b();
-        document.body.onclick = function() {
-            require(['./part/part.c.js'], function(c) {
-                c();
+构建输出的结果与`require.ensure`一致：
+```bash
+app.async.36a23b99.js    1.49 kB       1  [emitted]
+```
+
+> `import()`函数加载异步文件后返回一个Promise，所以需要客户端支持Promise或者使用polyfill。
+
+#### AMD
+AMD是对CommonJS的一种实现，它提供了浏览器的模块化runtime。AMD本身便具备动态加载的功能，以[require.js](http://www.requirejs.org/)为例：
+```JavaScript
+require(['./part/module.a.js'],function(moduleA){
+    window.onload = function() {
+        ModuleA();
+        document.body.onclick = function(){
+            require(['./part/module.b.js'], function(moduleB) {
+                moduleB();
             });
         }
-    });
-    ```
+    };
+})
+```
 
-    同样是点击body触发`part.c.js`的加载和执行，`require`API没有第三个参数，无法定义动态加载模块的文件名，所以最终编译生成的动态模块文件名中唯一有语义的就是模块的id:
-    ```bash
-    1.36a23b99.js    1.49 kB       1  [emitted]
-    ```
+AMD与`import()`有同一个缺陷：无法定义异步文件的名称，并且Webpack的特殊注释也并不适用于AMD，所以最终构建输出的结果如下：
+```bash
+1.36a23b99.js    1.49 kB       1  [emitted]
+```
+
+其中`1`是`chunk id`，由Webpack自动生成，开发者无法干预。
+
+从可移植性、语法的整洁度、构建结果的语义性以及未来可期等方面综合考虑，`import()`是目前实现动态加载最佳的方案。

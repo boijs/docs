@@ -1,29 +1,32 @@
-## 编译环境配置
+## 多环境支持
 
-boi支持为不同的环境配置独立的编译选项。boi将环境划分为三种：`development`、`testing`和`production`，三者的定义与执行时机如下表：
+Boi支持为不同的环境配置格子的构建、部署、插件等选项。
 
-| 名称 | value | 说明 | 执行时机 | uglify是否可用 | sourcemap | 备注 |
-| :---: | :---: | --- | --- | :---: | :---: | --- |
-| development | dev     | 本地开发环境 | `boi serve` | N | Y | entry包括livereload模块 |
-| testing     | testing | 测试环境 | `boi build --env testing` | Y | N | -- |
-| production  | prod    | 生产环境 | `boi build --env prod` | Y | N | -- |
+### 内置环境变量
+Boi内置了三种环境：`development`、`testing`和`production`，三者的定义与执行时机如下表：
+
+| 名称 | value | 说明 | 执行时机 | uglify是否可用 | hash是否可用 | sourcemap | 备注 |
+| :---: | :---: | --- | :---: | :---: | :---: | --- |
+| development | dev     | 开发环境 | serve | N | N | Y | entry包括HMR&livereload模块 |
+| testing     | testing | 测试环境 | build&deploy | Y | Y | N | -- |
+| production  | prod    | 生产环境 | build&depploy | Y | Y | N | -- |
 
 
-* `development`：本地开发环境，只在开启本地服务器时生效，所以`development`环境的配置项不会影响最终的编译结果；
+* `development`：本地开发环境，只在开启本地服务器时生效，所以针对`dev`环境的配置项不会影响最终的编译结果；
 * `testing`：测试环境，编译结果可用于上线之前的内部测试；
 * `production`：生产环境。
 
-boi之所以将以上三种环境进行区分，是为了覆盖一个前端项目从始至终的任何一个阶段。`development`环境下，boi提供本地服务容器和mock服务，方便前端工程师不依赖后端接口进行独立开发；区分`testing`环境和`production`环境是由于前端资源都是静态的，代码写死了就不会根据运行环境改变。最常见的场景是：
+Boi之所以将以上三种环境进行区分，是为了覆盖一个前端项目从始至终的任何一个阶段。`development`环境下，boi提供本地服务容器和mock服务，方便前端工程师不依赖后端接口进行独立开发；区分`testing`环境和`production`环境是由于前端资源都是静态的，代码写死了就不会根据运行环境改变。最常见的场景是：
 
-* 接口地址与主站是异域的，进行跨域请求时需要完整的接口url而不是path；
+* 接口地址与主站是异域的，进行跨域请求时需要携带域名的接口地址；
 * 测试环境与生产环境的接口域名不相同；
-* 测试完毕之后，如果需要提交上线，必须修改js脚本中接口的url。
+* 测试完毕之后，如果需要提交上线，必须修改js代码中的接口地址。
 
-这种场景下麻烦的是最后一步，要么人工手动修改，要么通过工具自动修改。即使使用工具，也需要手动修改工具的配置项。所以不论哪一种方式，都存在不必要的手动操作，不仅麻烦，而且容易出错。
+最麻烦的是最后一步，要么人工手动修改，要么通过工具自动修改。即使使用工具，也需要手动修改工具的配置项。所以不论哪一种方式，都存在不必要的手动操作，不仅麻烦，而且容易出错。
 
-boi对以上场景的解决方案是：结合环境配置和[JavaScript的define功能](_config-js.md)，为不同环境配置对应的配置项。比如：
+Boi对以上场景的解决方案是：结合环境配置和[JavaScript的define功能](_config-js.md)，为不同环境配置不同的接口地址。比如：
 
-```
+```JavaScript
 boi.spec('js',{
   dev: {
     define: {
@@ -31,31 +34,13 @@ boi.spec('js',{
     }
   },
   testing: {
-    useHash: false,
     define: {
       LOGIN_API: '//passport.test.com/login'
     }
   },
   prod: {
-    useHash: true,
     define: {
       LOGIN_API: '//passport.app.com/login'
-    }
-  }
-});
-
-boi.mock({
-  'GET /login': {
-    ok: {
-      code: 100,
-      msg: '登录成功',
-      data: {
-        user: 'boi'
-      }
-    },
-    fail: {
-      code: 200,
-      msg: '登录失败'
     }
   }
 });
@@ -63,8 +48,30 @@ boi.mock({
 
 以上配置的表现效果为：
 
-* `development`环境下将login接口映射到本地，通过本地服务器的Mock服务进行开发调试；
-* 执行`boi build --env testing`，根据`testing`环境的配置项，编译输出的文件中login接口被替换为测试url，并且不使用hash指纹；
-* 执行`boi build --env prod`，根据`production`环境的配置项，编译输出的文件中login接口被替换为线上url，并且文件url加上hash指纹。
+* `dev`环境下将login接口映射到本地，通过本地服务器的Mock服务进行开发调试；
+* 执行`boi build -e testing`，根据`testing`环境的配置项，编译输出的文件中login接口被替换为`'//passport.test.com/login'`；
+* 执行`boi build -e prod`，根据`production`环境的配置项，编译输出的文件中login接口被替换为`'//passport.app.com/login'`。
 
-> 目前分环境配置功能只支持通过`boi.spec`API进行配置。
+### 自定义环境变量
+对于复杂的项目而言可能不止需要三种环境，比如有些产品需要仿真环境、灰度环境等。除了内置的三种环境以外，还可以通过`boi.envs()`API扩展自定义环境：
+```JavaScript
+boi.envs(envs);
+```
+
+* `envs`，`Array`，代表自定义的环境变量。
+
+比如存在以下配置项：
+```JavaScript
+boi.envs(['grey','sim']);
+```
+
+此时Boi可用的环境变量便扩展到5个：
+* `dev`
+* `testing`
+* `prod`
+* `grey`
+* `sim`
+
+接下来你可以针对这五种环境分别进行配置。
+
+> 与`boi.use()`一样，`boi.envs()`在`boi-conf.js`中的位置并不影响它的解析顺序，你可以将其置于任意位置。但是为了代码的整洁度和可读性，建议将其置于`boi-conf.js`的最顶端。
