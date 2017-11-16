@@ -18,8 +18,6 @@ boi.spec('html',options);
 
 * `mainFilePrefix`：`String`，html文件的命名前缀，默认为`index`。也就是说，默认的html入口文件名为`index.[name].html`；
 
-* `staticLocateMode`：`String`，资源定位模式，可取值`"strict"|"loose"`，默认为`"loose"`。此配置是针对存在多个html入口并且每个html所需的静态资源不同的多页面项目。更多细节请参阅[多页面开发](_multipage.md);
-
 * `removePrefixAfterBuilt`:`Boolean`，编译输出的html文件是否去除`index`前缀，默认为`true`。比如一个[多页面项目](_multipage.md)中存在两个index文件`index.home.html`和`index.about.html`，开启`removePrefixAfterBuilt`编译输出的文件名分别为`home.html`和`about.html`，否则保持与源文件同名；
 
 * `urlTimestamp`：`Boolean`，是否在静态资源url后加上时间戳（比如`//static.app.com/common.js?t=1476183177875`），默认为`false`。此配置项是处理浏览器缓存的一种方案，理想方案是使用文件hash指纹，而不是url query。开启此选项后不论项目中的静态资源是否更新，其Url都会加上时间戳query。

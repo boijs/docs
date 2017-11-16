@@ -22,6 +22,8 @@ boi.spec('style',options);
 
 * `useHash`：`Boolean`，编译输出的css文件名是否加上hash指纹，默认为`true`。也就是说，默认的编译输出js文件名为`main.[name].[hash].css`;
 
+* `extract`: `Boolean`；
+
 * `autoprefix`：`Boolean`，是否自动补全前缀，默认为`false`。
 > Boi使用postcss实现自动补全前缀，但是可能会引起一些**中间版本**浏览器无法兼容的问题。比如，flex布局在IOS8的Safari下的写法应该是`display:-webkit-box-flex`，而大多数编译工具的自动补全会将其修复为`display: -webkit-flex`。所以，我们不推荐使用编译工具的自动补全功能，而是由开发人员编写预编译mixins实现。
 
@@ -31,6 +33,57 @@ boi.spec('style',options);
   * `retina`：`Boolean`，是否识别多分辨率标识并生成多分辨率sprites图片。如果设置为`true`，boi可识别以`@2x`形式后缀命名的图片并单独打包。
 
   > 关于css sprites的实现方案可以参考这篇文章[基于webpack的css sprites实现方案](http://www.caiziguoguo.com/cj21j94e5000uwj0hlbvlisk6/)。
+
+### CSS Sprites规范
+如果使用Vue/React等可编写CSS in JS的框架或类似工具，你可能会在JavaScript代码中引用散列的图标文件，然后试图使用Boi将其合并为Sprites图片。比如存在以下源码`app.vue`：
+```Vue
+<template>
+<!-- ... -->
+</template>
+<script>
+export default {};
+</script>
+<style lang='scss'>
+.icon{
+  &__home{
+    background-image: url('../assets/icons/icon-home.png');
+  }
+  &__about{
+    background-image: url('../assets/icons/icon-about.png');
+  }
+}
+</style>
+```
+
+上述代码经Boi构建之后并不能得到正确的Sprites图片。
+
+我们针对类似场景指定了与CSS Sprites相关的一系列规范，如下：
+* 声明散列图标的源码应当存放于`main.<appname>.css`中；
+* 不会将在Vue/React等源码文件中声明的散列图标合并为Sprites图片。
+
+依照规范将上例进行改进如下：
+1. 在`main.app.scss`中声明散列图标如下：
+```css
+.icon{
+    &__home{
+      background-image: url('../assets/icons/icon-home.png');
+    }
+    &__about{
+      background-image: url('../assets/icons/icon-about.png');
+    }
+}
+```
+2. 在`app.vue`中引入`main.app.scss`:
+```Vue
+<style lang='scss'>
+@import '../style/main.app.scss';
+</style>
+```
+也可以在`main.app.js`中引入：
+```JavaScript
+import '../style/main.app.scss';
+```
+
 
 ### 示例
 ```JavaScript

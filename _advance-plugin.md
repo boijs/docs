@@ -42,5 +42,10 @@ module.exports = function(options){};
 
 上述代码中函数的参数`options`即可接受的配置项集合。
 
+### 全局变量
+插件内部可以使用Boi提供的全局变量`process.env.BOI_ENV`。此变量代表Boi的执行环境，你可以根据不同的需求针对不同的环境进行逻辑分发。
+
+> 如果你想编写一款通用性较强的插件，我们建议在插件内部只针对Boi提供的三种[内置环境变量](_envs.md)（dev/testing/prod）进行逻辑分发。实际上，最好的方案是之区分`dev`环境，非开发环境下的逻辑表现应该保持统一。
+
 ### 示例
 可参考[boi-plugin-vue](https://github.com/boijs/boi-plugin-vue)源码。
