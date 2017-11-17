@@ -1,18 +1,24 @@
 <div align='center'>
   <div>
+
   ![](./assets/slogan.jpg)
+
   </div>
   <br/>
 
   <div align='center'>
+
   [![license](https://img.shields.io/github/license/boijs/boi.svg?style=plastic)](https://github.com/boijs/boi/blob/master/LICENSE)
   [![npm](https://img.shields.io/npm/v/boi.svg?style=plastic)](https://www.npmjs.com/package/boi)
+
   </div>
 
   <div align='center' style="margin-top:8px;">
+
   [![GitHub stars](https://img.shields.io/github/stars/boijs/boi.svg?style=social&label=Stars)](https://github.com/boijs/boi)
   [![GitHub forks](https://img.shields.io/github/forks/boijs/boi.svg?style=social&label=Fork)](https://github.com/boijs/boi)
   [![GitHub followers](https://img.shields.io/github/followers/zhoujunpeng.svg?style=social&label=Follow)](https://github.com/zhoujunpeng)
+  
   </div>
   <br/>
 
