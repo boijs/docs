@@ -131,10 +131,17 @@ Boi支持多页面开发，并且对于单页面应用和多页面应用分别�
 </html>
 ```
 
-以上的输出结果正是我们需要的。开发者唯一需要做的就是**在html源文件内添加link和script标签指明需要哪些资源引用**。Boi会帮你完成资源定位和地址替换。另外，如果通过[`boi.spec('js',<options>)`](_config-js.md)配置了`splitCommonModule`或者`files.common`，需在所有html文件中创建一个script标签引用common文件：
+以上的输出结果正是我们需要的。开发者唯一需要做的就是**在html源文件内添加link和script标签指明需要哪些资源引用**。Boi会帮你完成资源定位和地址替换。
+
+#### common&dll
+
+如果通过[`boi.spec('js',<options>)`](_config-js.md)配置了提取common模块或dll模块，则需在需要引入两者的html文件中创建对应的script标签：
 ```html
+<script src="<appname>.dll.js" charset="utf-8"></script>
 <script src="common.<appname>.js" charset="utf-8"></script>
 ```
+
+> common模块是所有html文档均需要引入的。dll模块的引入与否根据业务代码决定。
 
 其中`appname`是由[`basic`配置](_config-basic.md)指定。
 

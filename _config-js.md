@@ -24,7 +24,14 @@ boi.spec('js',options);
 * `asyncModuleHash`：`Boolean`，编译输出的异步模块js文件名是否加上hash指纹，默认为`true`。也就是说，默认编译输出的异步js文件名为`[appname].[moduleName].[hash].js`；
 > 更多细节请查阅[模块化开发](_modules.md)；
 
-* `splitCommonModule`：`Boolean`，是否提取公共模块并将其单独打包成一个文件，默认为`true`。开启此选项后Boi将提取Webpack runtime和manifest文件并编译为独立的`common.[appname].[hash].js`；
+* `splitCommonModule`：`Boolean`，是否提取公共模块并将其单独打包成一个文件，默认为`true`。开启此选项后Boi将提取Webpack runtime编译为独立的`common.[appname].[hash].js`。如果配置了`files.common`不为空，则其声明的模块也会被打包；
+
+* `splitDllModule`：`Boolean`，是否提取公共第三方模块并将其单独打包成一个文件，默认为`false`。开启此选项需要与`files.common`配合，Boi将提取`files.common`声明的第三方模块并编译为独立的`[appname].dll.js`；
+> `splitDllModule`与`splitCommonModule`并不是重复的两个选项。
+> * `splitCommonModule`提取的公共部分包括Webpack runtime，其中有与业务逻辑相关的代码，比如模块路径信息。也就是说`common.[appname].[hash].js`的hash会跟随业务代码的改变而改变。
+> * `splitDllModule`的目标是提取*第三方模块*，比如`vue`。这些模块与业务逻辑无关，甚至可能在项目存活期间不会进行版本的迭代，可以被客户端长久缓存，这也是`[appname].dll.js`没有hash指纹的主要原因。
+> 
+> 需要注意的是，如果多页项目中提取dll文件，则跟commmon文件一样需要在html文档中手动声明。详情请参阅[多页面开发](_multipage.md)
 
 * `lint`：`Boolean`，是否进行代码规范测试，默认为`true`。此选项只在运行`boi build`命令是可用，开启后Boi将会在项目根目录下创建`.eslintrc`文件（需执行`boi build -i`或`boi serve -i`），并使用[eslint](http://eslint.cn)对源码进行规范测试；
 
